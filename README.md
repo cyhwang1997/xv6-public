@@ -1,5 +1,5 @@
-##xv6 Chapter 3 Excerise 2
+## xv6 Chapter 3 Excerise 2
 
-###How to run
+### How to run
 make qemu-nox
 date
