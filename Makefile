@@ -181,6 +181,8 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
+  _date\
+#CY Chapter 3-2
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
