@@ -1,5 +1,5 @@
 ## How to run
-make qemu-nox
+make qemu-nox    
 echo hello world | wc
 
 
