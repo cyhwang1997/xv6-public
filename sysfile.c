@@ -453,7 +453,7 @@ sys_sematest(void)
   if(argint(0, &cmd) < 0)
     return -1;
   switch (cmd) {
-    case 0 : initsema(&sema1, 5); ret = 5; break;
+    case 0 : initsema(&sema1, 1); ret = 1; break;
     case 1 : ret = upsema(&sema1); break;
     case 2 : ret = downsema(&sema1); break;
     default : ret = -1; break;

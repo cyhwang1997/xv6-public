@@ -5,29 +5,30 @@
 void
 cy_test(void)
 {
-  int i, pid;
+//  int i, pid;
+  int pid;
   sematest(0);
 
 
-  for (i = 0; i < 10; i++) {
+//  for (i = 0; i < 10; i++) {
     pid = fork();
-    if (!pid)
-      break;
-  }
+//    if (!pid)
+//      break;
+//  }
 
   if (pid) {
-    sleep(300);
-    for (i = 0; i < 10; i++)
-      wait();
-
+    sleep(200);
+    while (wait() != -1)
+      ;
     sematest(1);
-    printf(1, "Final %d\n", sematest(2));
+    printf(1, "final %d\n", sematest(2));
   }
   else {
-    printf(1, "%d Down: %d\n", i, sematest(1));
-    sleep(100);
-    printf(1, "%d   Up: %d\n", i, sematest(2));
+    printf(1, "child %d: value %d\n", pid, sematest(1));
+    printf(1, "child %d: value %d\n", pid, sematest(2));
+    exit();
   }
+
 /*  int pid1;
   pid1 = fork();
   if (pid1 == 0)
