@@ -11,7 +11,8 @@
 #define PIPESIZE 512
 
 struct pipe {
-  struct spinlock lock;
+  struct spinlock var_lock;   /*CY Chapter 5-8*/
+  struct spinlock data_lock;  /*CY Chatper 5-8*/
   char data[PIPESIZE];
   uint nread;     // number of bytes read
   uint nwrite;    // number of bytes written
@@ -34,7 +35,8 @@ pipealloc(struct file **f0, struct file **f1)
   p->writeopen = 1;
   p->nwrite = 0;
   p->nread = 0;
-  initlock(&p->lock, "pipe");
+  initlock(&p->var_lock, "pipe_var");
+  initlock(&p->data_lock, "pipe_data");
   (*f0)->type = FD_PIPE;
   (*f0)->readable = 1;
   (*f0)->writable = 0;
@@ -59,7 +61,7 @@ pipealloc(struct file **f0, struct file **f1)
 void
 pipeclose(struct pipe *p, int writable)
 {
-  acquire(&p->lock);
+  acquire(&p->var_lock);
   if(writable){
     p->writeopen = 0;
     wakeup(&p->nread);
@@ -68,10 +70,10 @@ pipeclose(struct pipe *p, int writable)
     wakeup(&p->nwrite);
   }
   if(p->readopen == 0 && p->writeopen == 0){
-    release(&p->lock);
+    release(&p->var_lock);
     kfree((char*)p);
   } else
-    release(&p->lock);
+    release(&p->var_lock);
 }
 
 //PAGEBREAK: 40
@@ -80,20 +82,22 @@ pipewrite(struct pipe *p, char *addr, int n)
 {
   int i;
 
-  acquire(&p->lock);
+  acquire(&p->var_lock);
   for(i = 0; i < n; i++){
     while(p->nwrite == p->nread + PIPESIZE){  //DOC: pipewrite-full
       if(p->readopen == 0 || myproc()->killed){
-        release(&p->lock);
+        release(&p->var_lock);
         return -1;
       }
       wakeup(&p->nread);
-      sleep(&p->nwrite, &p->lock);  //DOC: pipewrite-sleep
+      sleep(&p->nwrite, &p->var_lock);  //DOC: pipewrite-sleep
     }
+    acquire(&p->data_lock);  /*CY Chapter 5-8*/
     p->data[p->nwrite++ % PIPESIZE] = addr[i];
+    release(&p->data_lock);  /*CY Chapter 5-8*/
   }
   wakeup(&p->nread);  //DOC: pipewrite-wakeup1
-  release(&p->lock);
+  release(&p->var_lock);
   return n;
 }
 
@@ -102,20 +106,22 @@ piperead(struct pipe *p, char *addr, int n)
 {
   int i;
 
-  acquire(&p->lock);
+  acquire(&p->var_lock);
   while(p->nread == p->nwrite && p->writeopen){  //DOC: pipe-empty
     if(myproc()->killed){
-      release(&p->lock);
+      release(&p->var_lock);
       return -1;
     }
-    sleep(&p->nread, &p->lock); //DOC: piperead-sleep
+    sleep(&p->nread, &p->var_lock); //DOC: piperead-sleep
   }
   for(i = 0; i < n; i++){  //DOC: piperead-copy
     if(p->nread == p->nwrite)
       break;
+    acquire(&p->data_lock);  /*CY Chapter 5-8*/
     addr[i] = p->data[p->nread++ % PIPESIZE];
+    release(&p->data_lock);  /*CY Chapter 5-8*/
   }
   wakeup(&p->nwrite);  //DOC: piperead-wakeup
-  release(&p->lock);
+  release(&p->var_lock);
   return i;
 }
