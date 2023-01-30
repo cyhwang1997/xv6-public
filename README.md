@@ -1,6 +1,6 @@
 ## How to Run
 make qemu-nox   
-cytest (test copied from https://oslab.kaist.ac.kr/ee488-fall-2022-homework-5/)
+cytest
 
 ## xv6
 NOTE: we have stopped maintaining the x86 version of xv6, and switched

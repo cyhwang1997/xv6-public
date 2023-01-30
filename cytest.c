@@ -24,8 +24,8 @@ cy_test(void)
     printf(1, "final %d\n", sematest(2));
   }
   else {
-    printf(1, "child %d: value %d\n", pid, sematest(1));
-    printf(1, "child %d: value %d\n", pid, sematest(2));
+    printf(1, "child: value %d\n", sematest(1));
+    printf(1, "child: value %d\n", sematest(2));
     exit();
   }
 
