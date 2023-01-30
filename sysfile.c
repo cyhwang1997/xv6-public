@@ -15,6 +15,7 @@
 #include "sleeplock.h"
 #include "file.h"
 #include "fcntl.h"
+#include "semaphore.h"
 
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
@@ -441,4 +442,22 @@ sys_pipe(void)
   fd[0] = fd0;
   fd[1] = fd1;
   return 0;
+}
+
+int
+sys_sematest(void)
+{
+  int cmd, ret = 0;
+  static struct semaphore sema1;
+
+  if(argint(0, &cmd) < 0)
+    return -1;
+  switch (cmd) {
+    case 0 : initsema(&sema1, 5); ret = 5; break;
+    case 1 : ret = upsema(&sema1); break;
+    case 2 : ret = downsema(&sema1); break;
+    default : ret = -1; break;
+  }
+
+  return ret;
 }

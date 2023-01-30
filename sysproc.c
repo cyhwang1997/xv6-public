@@ -90,12 +90,3 @@ sys_uptime(void)
   return xticks;
 }
 
-/*CY Chapter 3-2*/
-int
-sys_date(void)
-{
-  struct rtcdate *t;
-  argptr(0, (void*)&t, sizeof(*t));
-  cmostime(t);
-  return 0;
-}

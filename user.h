@@ -23,7 +23,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int date(struct rtcdate*);/*CY Chapter 3-2*/
+int sematest(int);/*CY Chapter 5-3*/
 
 // ulib.c
 int stat(const char*, struct stat*);
