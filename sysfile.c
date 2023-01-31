@@ -386,8 +386,8 @@ sys_chdir(void)
     end_op();
     return -1;
   }
-  iunlock(ip);
   iput(curproc->cwd);
+  iunlock(ip);
   end_op();
   curproc->cwd = ip;
   return 0;
