@@ -314,6 +314,9 @@ sys_open(void)
     }
   }
 
+ if ((omode & O_TRUNC) && ((omode & O_WRONLY) || (omode & O_RDWR)))
+    itrunc(ip);
+
   if((f = filealloc()) == 0 || (fd = fdalloc(f)) < 0){
     if(f)
       fileclose(f);
@@ -329,6 +332,7 @@ sys_open(void)
   f->off = 0;
   f->readable = !(omode & O_WRONLY);
   f->writable = (omode & O_WRONLY) || (omode & O_RDWR);
+  f->append = (omode & O_APPEND) ? 1 : 0;
   return fd;
 }
 
